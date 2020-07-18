@@ -8,6 +8,7 @@ import 'package:yellow_billy_bot/model/base_model.dart';
 
 class NetworkUtil {
   // next three lines makes this class a Singleton
+
   static NetworkUtil _instance = new NetworkUtil.internal();
 
   NetworkUtil.internal();
@@ -16,18 +17,29 @@ class NetworkUtil {
 
   final JsonDecoder _decoder = new JsonDecoder();
 
-  Future<dynamic> get(String url) {
+  Future<BaseModel> get(String url) async {
+    BaseModel baseModel = BaseModel();
 
-    return http.get(url).then((http.Response response) {
-      final String res = response.body;
-      final int statusCode = response.statusCode;
+    if(await checkInternet()) {
+    print(url);
+    return http.get(url,headers: {
+    HttpHeaders.authorizationHeader: 'Bearer AdVBa9zC_sskncQ9NiP6mRFxQIsii_Ge',
+    HttpHeaders.contentTypeHeader: 'application/json',
+    }).then((http.Response response) {
+    final String res = response.body;
+    final int statusCode = response.statusCode;
 
-      if (statusCode < 200 || statusCode > 400 || json == null) {
-        throw new Exception("Error while fetching data");
-      }
-      print(response.body);
-      return _decoder.convert(res);
+    if (statusCode < 200 || statusCode > 400 || json == null) {
+    throw new Exception("Error while fetching data");
+    }
+    print(response.body);
+    baseModel.data = _decoder.convert(res);
+    return baseModel;
     });
+    }else{
+      baseModel.status=Status.no_network;
+      return baseModel;
+    }
   }
 
   Future<bool> checkInternet() async {
