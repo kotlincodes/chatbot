@@ -37,12 +37,8 @@ class _SplashState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Container(
-      decoration: new BoxDecoration(
-//        image: new DecorationImage(
-//          image: new AssetImage("assets/images/bg_splash.jpg"),
-//          fit: BoxFit.fill,
-//        ),
-      ),
+     color: Colors.white,
+      child: Center(child: CircularProgressIndicator()),
     );
     throw UnimplementedError();
   }
