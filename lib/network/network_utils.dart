@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:async/async.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:http/http.dart' as http;
@@ -20,24 +21,25 @@ class NetworkUtil {
   Future<BaseModel> get(String url) async {
     BaseModel baseModel = BaseModel();
 
-    if(await checkInternet()) {
-    print(url);
-    return http.get(url,headers: {
-    HttpHeaders.authorizationHeader: 'Bearer AdVBa9zC_sskncQ9NiP6mRFxQIsii_Ge',
-    HttpHeaders.contentTypeHeader: 'application/json',
-    }).then((http.Response response) {
-    final String res = response.body;
-    final int statusCode = response.statusCode;
+    if (await checkInternet()) {
+      print(url);
+      return http.get(url, headers: {
+        HttpHeaders.authorizationHeader:
+            'Bearer AdVBa9zC_sskncQ9NiP6mRFxQIsii_Ge',
+        HttpHeaders.contentTypeHeader: 'application/json',
+      }).then((http.Response response) {
+        final String res = response.body;
+        final int statusCode = response.statusCode;
 
-    if (statusCode < 200 || statusCode > 400 || json == null) {
-    throw new Exception("Error while fetching data");
-    }
-    print(response.body);
-    baseModel.data = _decoder.convert(res);
-    return baseModel;
-    });
-    }else{
-      baseModel.status=Status.no_network;
+        if (statusCode < 200 || statusCode > 400 || json == null) {
+          throw new Exception("Error while fetching data");
+        }
+        print(response.body);
+        baseModel.data = _decoder.convert(res);
+        return baseModel;
+      });
+    } else {
+      baseModel.status = Status.no_network;
       return baseModel;
     }
   }
@@ -53,15 +55,16 @@ class NetworkUtil {
   }
 
   Future<BaseModel> post(String url, {Map headers, body, encoding}) async {
-    if(await checkInternet()) {
+    if (await checkInternet()) {
       print(url);
       print(body);
       BaseModel baseModel = BaseModel();
       var headers = {"Content-Type": "application/json"};
       var x = http.post(url);
-      return http.post(url,
-          headers: {"Content-Type": "application/json"},
-          body: jsonEncode(body))
+      return http
+          .post(url,
+              headers: {"Content-Type": "application/json"},
+              body: jsonEncode(body))
           .then((http.Response response) {
         final String res = response.body;
         final int statusCode = response.statusCode;
@@ -78,7 +81,7 @@ class NetworkUtil {
         baseModel.status = Status.error;
         return baseModel;
       });
-    }else{
+    } else {
       return BaseModel(status: Status.error);
     }
   }
@@ -109,14 +112,15 @@ class NetworkUtil {
 //    });
 //  }
 
-  Future<dynamic>postMultiPart(url, {File imageFile, body}) async {
+  Future<dynamic> postMultiPart(url, {File imageFile, body}) async {
     print(body);
 
     var uri = Uri.parse(url);
 
     var request = new http.MultipartRequest("POST", uri);
-    if(imageFile!=null){
-      var stream = http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+    if (imageFile != null) {
+      var stream =
+          http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
       var length = await imageFile.length();
 
       var multipartFile = new http.MultipartFile('resume_file', stream, length,
@@ -130,16 +134,14 @@ class NetworkUtil {
     request.headers.addAll(headers);
     request.fields.addAll(body);
 
-    print(uri.toString()+request.fields.toString());
+    print(uri.toString() + request.fields.toString());
     var response = await request.send();
     print(response.statusCode);
     response.stream.transform(utf8.decoder).listen((value) {
       print(value);
       return value;
-    }).onError((error){
+    }).onError((error) {
       print(error);
     });
   }
 }
-
-
